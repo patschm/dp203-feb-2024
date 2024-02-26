@@ -154,6 +154,46 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "Use M2SalesLake\nGO\n\nSELECT TOP (100) [Id]\n,[FirstName]\n,[LastName]\n,[CompanyName]\n,[StreetName]\n,[Number]\n,[City]\n,[Region]\n,[Country]\n FROM [M2SalesLake].[dbo].[Temp]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "M2SalesLake",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 5')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "Use M2SalesLake\nGO\n\nSELECT TOP (100) [Id]\n,[BrandName]\n,[Name]\n,[Price]\n FROM [M2SalesLake].[dbo].[Products]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "M2SalesLake",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/M2SalesLake')]",
 			"type": "Microsoft.Synapse/workspaces/databases",
 			"apiVersion": "2019-06-01-preview",
@@ -189,366 +229,6 @@
 						"OldEntity": null,
 						"NewEntity": {
 							"Name": "Customers",
-							"EntityType": "TABLE",
-							"Namespace": {
-								"DatabaseName": "M2SalesLake"
-							},
-							"Description": "",
-							"TableType": "EXTERNAL",
-							"Origin": {
-								"Type": "SPARK"
-							},
-							"StorageDescriptor": {
-								"Columns": [
-									{
-										"Name": "Id",
-										"OriginDataTypeName": {
-											"TypeName": "long",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Properties": {
-												"HIVE_TYPE_STRING": "long"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "FirstName",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "string",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Length": 256,
-											"Properties": {
-												"HIVE_TYPE_STRING": "string"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "LastName",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "string",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Length": 256,
-											"Properties": {
-												"HIVE_TYPE_STRING": "string"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "CompanyName",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "string",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Length": 256,
-											"Properties": {
-												"HIVE_TYPE_STRING": "string"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "Address",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "string",
-											"IsNullable": false,
-											"IsComplexType": false,
-											"Length": 4000,
-											"Properties": {
-												"HIVE_TYPE_STRING": "string"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									}
-								],
-								"Format": {
-									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
-									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
-									"FormatType": "parquet",
-									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
-									"Properties": {
-										"path": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Customers",
-										"FormatTypeSetToDatabaseDefault": true
-									}
-								},
-								"Source": {
-									"Provider": "ADLS",
-									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Customers",
-									"Properties": {
-										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
-										"LocationSetToDatabaseDefault": true
-									}
-								},
-								"Properties": {
-									"textinputformat.record.delimiter": ",",
-									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
-									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
-								},
-								"Compressed": false,
-								"IsStoredAsSubdirectories": false
-							},
-							"Properties": {
-								"Description": "",
-								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
-								"PrimaryKeys": "Id",
-								"spark.sql.sources.provider": "parquet"
-							},
-							"Retention": 0,
-							"Temporary": false,
-							"IsRewriteEnabled": false
-						},
-						"Source": {
-							"Type": "SPARK"
-						}
-					},
-					{
-						"ActionType": "CREATE",
-						"OldEntity": null,
-						"NewEntity": {
-							"Name": "Orders",
-							"EntityType": "TABLE",
-							"Namespace": {
-								"DatabaseName": "M2SalesLake"
-							},
-							"Description": "",
-							"TableType": "EXTERNAL",
-							"Origin": {
-								"Type": "SPARK"
-							},
-							"StorageDescriptor": {
-								"Columns": [
-									{
-										"Name": "Id",
-										"OriginDataTypeName": {
-											"TypeName": "long",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Properties": {
-												"HIVE_TYPE_STRING": "long"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "Quantity",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "integer",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Properties": {
-												"HIVE_TYPE_STRING": "integer"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "TotalPrice",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "decimal",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Precision": 10,
-											"Scale": 2,
-											"Properties": {
-												"HIVE_TYPE_STRING": "decimal"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "CustomerId",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "long",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Properties": {
-												"HIVE_TYPE_STRING": "long"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "ProductId",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "long",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Properties": {
-												"HIVE_TYPE_STRING": "long"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									}
-								],
-								"Format": {
-									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
-									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
-									"FormatType": "parquet",
-									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
-									"Properties": {
-										"path": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Orders",
-										"FormatTypeSetToDatabaseDefault": true
-									}
-								},
-								"Source": {
-									"Provider": "ADLS",
-									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Orders",
-									"Properties": {
-										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
-										"LocationSetToDatabaseDefault": true
-									}
-								},
-								"Properties": {
-									"textinputformat.record.delimiter": ",",
-									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
-									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
-								},
-								"Compressed": false,
-								"IsStoredAsSubdirectories": false
-							},
-							"Properties": {
-								"Description": "",
-								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
-								"PrimaryKeys": "Id",
-								"spark.sql.sources.provider": "parquet"
-							},
-							"Retention": 0,
-							"Temporary": false,
-							"IsRewriteEnabled": false
-						},
-						"Source": {
-							"Type": "SPARK"
-						}
-					},
-					{
-						"ActionType": "CREATE",
-						"OldEntity": null,
-						"NewEntity": {
-							"Name": "Products",
-							"EntityType": "TABLE",
-							"Namespace": {
-								"DatabaseName": "M2SalesLake"
-							},
-							"Description": "",
-							"TableType": "EXTERNAL",
-							"Origin": {
-								"Type": "SPARK"
-							},
-							"StorageDescriptor": {
-								"Columns": [
-									{
-										"Name": "Id",
-										"OriginDataTypeName": {
-											"TypeName": "long",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Properties": {
-												"HIVE_TYPE_STRING": "long"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "BrandName",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "string",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Length": 256,
-											"Properties": {
-												"HIVE_TYPE_STRING": "string"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "Name",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "string",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Length": 256,
-											"Properties": {
-												"HIVE_TYPE_STRING": "string"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									},
-									{
-										"Name": "Price",
-										"Description": "",
-										"OriginDataTypeName": {
-											"TypeName": "decimal",
-											"IsComplexType": false,
-											"IsNullable": false,
-											"Precision": 10,
-											"Scale": 2,
-											"Properties": {
-												"HIVE_TYPE_STRING": "decimal"
-											}
-										},
-										"DeltaFormatInvalidMessages": []
-									}
-								],
-								"Format": {
-									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
-									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
-									"FormatType": "parquet",
-									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
-									"Properties": {
-										"path": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Products",
-										"FormatTypeSetToDatabaseDefault": true
-									}
-								},
-								"Source": {
-									"Provider": "ADLS",
-									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Products",
-									"Properties": {
-										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
-										"LocationSetToDatabaseDefault": true
-									}
-								},
-								"Properties": {
-									"textinputformat.record.delimiter": ",",
-									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
-									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
-								},
-								"Compressed": false,
-								"IsStoredAsSubdirectories": false
-							},
-							"Properties": {
-								"Description": "",
-								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
-								"PrimaryKeys": "Id",
-								"spark.sql.sources.provider": "parquet"
-							},
-							"Retention": 0,
-							"Temporary": false,
-							"IsRewriteEnabled": false
-						},
-						"Source": {
-							"Type": "SPARK"
-						}
-					},
-					{
-						"ActionType": "CREATE",
-						"OldEntity": null,
-						"NewEntity": {
-							"Name": "Temp",
 							"EntityType": "TABLE",
 							"Namespace": {
 								"DatabaseName": "M2SalesLake"
@@ -682,7 +362,7 @@
 									"FormatType": "csv",
 									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 									"Properties": {
-										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/customers_*.csv",
+										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/customers_1.csv",
 										"delimiter": ",",
 										"multiLine": "false",
 										"firstRowAsHeader": "true",
@@ -693,7 +373,7 @@
 								},
 								"Source": {
 									"Provider": "ADLS",
-									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/customers_*.csv",
+									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/customers_1.csv",
 									"Properties": {
 										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
 										"LocationSetToDatabaseDefault": false
@@ -701,7 +381,7 @@
 								},
 								"Properties": {
 									"textinputformat.record.delimiter": ",",
-									"compression": "",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
 									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
 								},
 								"Compressed": false,
@@ -715,8 +395,7 @@
 							},
 							"Retention": 0,
 							"Temporary": false,
-							"IsRewriteEnabled": false,
-							"Partitioning": {}
+							"IsRewriteEnabled": false
 						},
 						"Source": {
 							"Type": "SPARK"
@@ -726,7 +405,254 @@
 						"ActionType": "CREATE",
 						"OldEntity": null,
 						"NewEntity": {
-							"Name": "relationship-dvijgawuhj",
+							"Name": "Orders",
+							"EntityType": "TABLE",
+							"Namespace": {
+								"DatabaseName": "M2SalesLake"
+							},
+							"Description": "",
+							"TableType": "EXTERNAL",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"StorageDescriptor": {
+								"Columns": [
+									{
+										"Name": "Id",
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "Quantity",
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "TotalPrice",
+										"OriginDataTypeName": {
+											"TypeName": "double",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Properties": {
+												"HIVE_TYPE_STRING": "double"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "OrderDate",
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "ProductId",
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "CustomerId",
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									}
+								],
+								"Format": {
+									"InputFormat": "org.apache.hadoop.mapred.SequenceFileInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat",
+									"FormatType": "csv",
+									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+									"Properties": {
+										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/orders_1.csv",
+										"delimiter": ",",
+										"multiLine": "false",
+										"firstRowAsHeader": "true",
+										"serialization.format": "1",
+										"FormatTypeSetToDatabaseDefault": false,
+										"header": "true"
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/orders_1.csv",
+									"Properties": {
+										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": false
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"IsStoredAsSubdirectories": false
+							},
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "csv"
+							},
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Products",
+							"EntityType": "TABLE",
+							"Namespace": {
+								"DatabaseName": "M2SalesLake"
+							},
+							"Description": "",
+							"TableType": "EXTERNAL",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"StorageDescriptor": {
+								"Columns": [
+									{
+										"Name": "Id",
+										"OriginDataTypeName": {
+											"TypeName": "long",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Properties": {
+												"HIVE_TYPE_STRING": "long"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "BrandName",
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "Name",
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 8000,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									},
+									{
+										"Name": "Price",
+										"OriginDataTypeName": {
+											"TypeName": "double",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Properties": {
+												"HIVE_TYPE_STRING": "double"
+											}
+										},
+										"DeltaFormatInvalidMessages": []
+									}
+								],
+								"Format": {
+									"InputFormat": "org.apache.hadoop.mapred.SequenceFileInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat",
+									"FormatType": "csv",
+									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+									"Properties": {
+										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/products_1.csv",
+										"delimiter": ",",
+										"multiLine": "false",
+										"firstRowAsHeader": "true",
+										"serialization.format": "1",
+										"FormatTypeSetToDatabaseDefault": false,
+										"header": "true"
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/products_1.csv",
+									"Properties": {
+										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": false
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"IsStoredAsSubdirectories": false
+							},
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "csv"
+							},
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "relationship-gdgodsmoyn",
 							"EntityType": "RELATIONSHIP",
 							"Namespace": {
 								"DatabaseName": "M2SalesLake"
@@ -753,7 +679,7 @@
 						"ActionType": "CREATE",
 						"OldEntity": null,
 						"NewEntity": {
-							"Name": "relationship-peywqhmcza",
+							"Name": "relationship-ycyteckrav",
 							"EntityType": "RELATIONSHIP",
 							"Namespace": {
 								"DatabaseName": "M2SalesLake"
