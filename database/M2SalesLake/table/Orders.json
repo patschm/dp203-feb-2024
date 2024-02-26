@@ -1,7 +1,7 @@
 {
-	"name": "Products",
+	"name": "Orders",
 	"properties": {
-		"Name": "Products",
+		"Name": "Orders",
 		"EntityType": "TABLE",
 		"Namespace": {
 			"DatabaseName": "M2SalesLake"
@@ -26,35 +26,20 @@
 					"DeltaFormatInvalidMessages": []
 				},
 				{
-					"Name": "BrandName",
+					"Name": "Quantity",
 					"Description": "",
 					"OriginDataTypeName": {
-						"TypeName": "string",
+						"TypeName": "integer",
 						"IsNullable": false,
 						"IsComplexType": false,
-						"Length": 256,
 						"Properties": {
-							"HIVE_TYPE_STRING": "string"
+							"HIVE_TYPE_STRING": "integer"
 						}
 					},
 					"DeltaFormatInvalidMessages": []
 				},
 				{
-					"Name": "Name",
-					"Description": "",
-					"OriginDataTypeName": {
-						"TypeName": "string",
-						"IsNullable": false,
-						"IsComplexType": false,
-						"Length": 256,
-						"Properties": {
-							"HIVE_TYPE_STRING": "string"
-						}
-					},
-					"DeltaFormatInvalidMessages": []
-				},
-				{
-					"Name": "Price",
+					"Name": "TotalPrice",
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "decimal",
@@ -67,6 +52,32 @@
 						}
 					},
 					"DeltaFormatInvalidMessages": []
+				},
+				{
+					"Name": "CustomerId",
+					"Description": "",
+					"OriginDataTypeName": {
+						"TypeName": "long",
+						"IsNullable": false,
+						"IsComplexType": false,
+						"Properties": {
+							"HIVE_TYPE_STRING": "long"
+						}
+					},
+					"DeltaFormatInvalidMessages": []
+				},
+				{
+					"Name": "ProductId",
+					"Description": "",
+					"OriginDataTypeName": {
+						"TypeName": "long",
+						"IsNullable": false,
+						"IsComplexType": false,
+						"Properties": {
+							"HIVE_TYPE_STRING": "long"
+						}
+					},
+					"DeltaFormatInvalidMessages": []
 				}
 			],
 			"Format": {
@@ -75,7 +86,7 @@
 				"FormatType": "csv",
 				"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 				"Properties": {
-					"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/products*",
+					"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/orders*",
 					"delimiter": ",",
 					"multiLine": "false",
 					"firstRowAsHeader": "false",
@@ -88,7 +99,7 @@
 			},
 			"Source": {
 				"Provider": "ADLS",
-				"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/products*",
+				"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/orders*",
 				"Properties": {
 					"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
 					"LocationSetToDatabaseDefault": false

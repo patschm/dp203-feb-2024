@@ -17,7 +17,7 @@
 					"Name": "Id",
 					"OriginDataTypeName": {
 						"TypeName": "long",
-						"IsNullable": true,
+						"IsNullable": false,
 						"IsComplexType": false,
 						"Properties": {
 							"HIVE_TYPE_STRING": "long"
@@ -118,7 +118,7 @@
 		"Properties": {
 			"Description": "",
 			"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
-			"PrimaryKeys": "",
+			"PrimaryKeys": "Id",
 			"spark.sql.sources.provider": "csv",
 			"sql:IsAppendOnly": false
 		},
