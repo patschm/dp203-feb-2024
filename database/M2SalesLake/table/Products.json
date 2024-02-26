@@ -75,20 +75,20 @@
 				"FormatType": "csv",
 				"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 				"Properties": {
-					"path": "abfss://products*@pssynapselake.dfs.core.windows.net/",
+					"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/prod*.csv",
 					"delimiter": ",",
 					"multiLine": "false",
-					"firstRowAsHeader": "false",
+					"firstRowAsHeader": "true",
 					"serialization.format": "1",
 					"escape": "\\",
 					"quote": "\"",
 					"FormatTypeSetToDatabaseDefault": false,
-					"header": "false"
+					"header": "true"
 				}
 			},
 			"Source": {
 				"Provider": "ADLS",
-				"Location": "abfss://products*@pssynapselake.dfs.core.windows.net/",
+				"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/prod*.csv",
 				"Properties": {
 					"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
 					"LocationSetToDatabaseDefault": false
