@@ -70,21 +70,28 @@
 				}
 			],
 			"Format": {
-				"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
-				"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
-				"FormatType": "parquet",
-				"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+				"InputFormat": "org.apache.hadoop.mapred.SequenceFileInputFormat",
+				"OutputFormat": "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat",
+				"FormatType": "csv",
+				"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 				"Properties": {
-					"path": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Products",
-					"FormatTypeSetToDatabaseDefault": true
+					"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/prod*.csv",
+					"delimiter": ",",
+					"multiLine": "false",
+					"firstRowAsHeader": "true",
+					"serialization.format": "1",
+					"escape": "\\",
+					"quote": "\"",
+					"FormatTypeSetToDatabaseDefault": false,
+					"header": "true"
 				}
 			},
 			"Source": {
 				"Provider": "ADLS",
-				"Location": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb/Products",
+				"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/prod*.csv",
 				"Properties": {
 					"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
-					"LocationSetToDatabaseDefault": true
+					"LocationSetToDatabaseDefault": false
 				}
 			},
 			"Properties": {
@@ -99,7 +106,7 @@
 			"Description": "",
 			"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
 			"PrimaryKeys": "Id",
-			"spark.sql.sources.provider": "parquet"
+			"spark.sql.sources.provider": "csv"
 		},
 		"Retention": 0,
 		"Temporary": false,

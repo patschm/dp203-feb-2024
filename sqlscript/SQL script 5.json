@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 5",
+	"properties": {
+		"content": {
+			"query": "Use M2SalesLake\nGO\n\nSELECT TOP (100) [Id]\n,[BrandName]\n,[Name]\n,[Price]\n FROM [M2SalesLake].[dbo].[Products]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "M2SalesLake",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
