@@ -1,0 +1,22 @@
+{
+	"name": "M2SalesLake",
+	"properties": {
+		"Name": "M2SalesLake",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage"
+			}
+		}
+	},
+	"type": "DATABASE"
+}
