@@ -68,12 +68,12 @@
 					"DeltaFormatInvalidMessages": []
 				},
 				{
-					"Name": "Address",
+					"Name": "StreetName",
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "string",
-						"IsComplexType": false,
 						"IsNullable": false,
+						"IsComplexType": false,
 						"Length": 4000,
 						"Properties": {
 							"HIVE_TYPE_STRING": "string"
