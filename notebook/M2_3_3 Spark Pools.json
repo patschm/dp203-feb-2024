@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "5b555e9a-5029-42a5-b358-0405119ecc16"
+				"spark.autotune.trackingId": "518f4e26-04a5-42c5-9375-d31b8494f5ae"
 			}
 		},
 		"metadata": {
@@ -215,7 +215,7 @@
 				},
 				"source": [
 					"## Even modifying data is possible\r\n",
-					"Will only work if data is in parquet format and the external table is not assigned to a single file"
+					"###### Will only work if data is in parquet format and the external table is not assigned to a single file"
 				]
 			},
 			{
