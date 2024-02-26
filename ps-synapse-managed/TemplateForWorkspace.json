@@ -275,23 +275,23 @@
 									"FormatType": "csv",
 									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 									"Properties": {
-										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/cust*.csv",
+										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/Customers",
 										"delimiter": ",",
 										"multiLine": "false",
 										"firstRowAsHeader": "true",
 										"serialization.format": "1",
 										"escape": "\\",
 										"quote": "\"",
-										"FormatTypeSetToDatabaseDefault": false,
+										"FormatTypeSetToDatabaseDefault": true,
 										"header": "true"
 									}
 								},
 								"Source": {
 									"Provider": "ADLS",
-									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/cust*.csv",
+									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/Customers",
 									"Properties": {
 										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
-										"LocationSetToDatabaseDefault": false
+										"LocationSetToDatabaseDefault": true
 									}
 								},
 								"Properties": {
@@ -310,8 +310,7 @@
 							},
 							"Retention": 0,
 							"Temporary": false,
-							"IsRewriteEnabled": false,
-							"Partitioning": {}
+							"IsRewriteEnabled": false
 						},
 						"Source": {
 							"Type": "SPARK"
@@ -406,23 +405,23 @@
 									"FormatType": "csv",
 									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 									"Properties": {
-										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/ord*.csv",
+										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/Orders",
 										"delimiter": ",",
 										"multiLine": "false",
 										"firstRowAsHeader": "true",
 										"serialization.format": "1",
 										"escape": "\\",
 										"quote": "\"",
-										"FormatTypeSetToDatabaseDefault": false,
+										"FormatTypeSetToDatabaseDefault": true,
 										"header": "true"
 									}
 								},
 								"Source": {
 									"Provider": "ADLS",
-									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/ord*.csv",
+									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/Orders",
 									"Properties": {
 										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
-										"LocationSetToDatabaseDefault": false
+										"LocationSetToDatabaseDefault": true
 									}
 								},
 								"Properties": {
@@ -441,8 +440,7 @@
 							},
 							"Retention": 0,
 							"Temporary": false,
-							"IsRewriteEnabled": false,
-							"Partitioning": {}
+							"IsRewriteEnabled": false
 						},
 						"Source": {
 							"Type": "SPARK"
@@ -526,23 +524,23 @@
 									"FormatType": "csv",
 									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 									"Properties": {
-										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/prod*.csv",
+										"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/Products",
 										"delimiter": ",",
 										"multiLine": "false",
 										"firstRowAsHeader": "true",
 										"serialization.format": "1",
 										"escape": "\\",
 										"quote": "\"",
-										"FormatTypeSetToDatabaseDefault": false,
+										"FormatTypeSetToDatabaseDefault": true,
 										"header": "true"
 									}
 								},
 								"Source": {
 									"Provider": "ADLS",
-									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/prod*.csv",
+									"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/Products",
 									"Properties": {
 										"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
-										"LocationSetToDatabaseDefault": false
+										"LocationSetToDatabaseDefault": true
 									}
 								},
 								"Properties": {
@@ -561,8 +559,7 @@
 							},
 							"Retention": 0,
 							"Temporary": false,
-							"IsRewriteEnabled": false,
-							"Partitioning": {}
+							"IsRewriteEnabled": false
 						},
 						"Source": {
 							"Type": "SPARK"
