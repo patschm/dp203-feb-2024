@@ -68,7 +68,7 @@
 					"DeltaFormatInvalidMessages": []
 				},
 				{
-					"Name": "StreetName",
+					"Name": "Address",
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "string",
