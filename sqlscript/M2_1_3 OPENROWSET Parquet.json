@@ -1,0 +1,20 @@
+{
+	"name": "M2_1_3 OPENROWSET Parquet",
+	"properties": {
+		"folder": {
+			"name": "Module 2.1"
+		},
+		"content": {
+			"query": "-- Simple\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'https://pssynapselake.dfs.core.windows.net/files/testdata/parquet/customers*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n-- With Fields\nSELECT\n    Id,\n    FirstName,\n    LastName,\n    CompanyName,\n    JSON_VALUE(Address, '$.StreetName') AS StreetName,\n    JSON_VALUE(Address, '$.Number') AS Number,\n    JSON_VALUE(Address, '$.City') AS City,\n    JSON_VALUE(Address, '$.Region') AS Region,\n    JSON_VALUE(Address, '$.Country') AS Country\nFROM\n    OPENROWSET(\n        BULK 'https://pssynapselake.dfs.core.windows.net/files/testdata/parquet/customers*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
