@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparky",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "8abbe55a-3ee8-4b19-837b-a0fda33f6536"
+				"spark.autotune.trackingId": "62c5f5b7-196d-426d-974a-84aaee535f1a"
 			}
 		},
 		"metadata": {
@@ -29,6 +33,21 @@
 			"language_info": {
 				"name": "python"
 			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b9fc0ff8-96c9-40f6-b971-1c711883d3a0/resourceGroups/Demos/providers/Microsoft.Synapse/workspaces/ps-synapse-managed/bigDataPools/sparky",
+				"name": "sparky",
+				"type": "Spark",
+				"endpoint": "https://ps-synapse-managed.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparky",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
 			"sessionKeepAliveTimeout": 30
 		},
 		"cells": [
@@ -37,9 +56,9 @@
 				"source": [
 					"global lakepath\r\n",
 					"\r\n",
-					"lakepath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/'"
+					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'"
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
