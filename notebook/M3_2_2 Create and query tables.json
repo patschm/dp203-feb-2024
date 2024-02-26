@@ -1,0 +1,263 @@
+{
+	"name": "M3_2_2 Create and query tables",
+	"properties": {
+		"folder": {
+			"name": "Module 3.2"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "91d3bfb5-0acf-4d64-a089-44ff6176c468"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Globals"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"global lakepath\r\n",
+					"lakepath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/'"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Define Table and Views (unmanaged)\r\n",
+					"\r\n",
+					"External tables are \"loosely bound\" to the underlying files and deleting the table does not delete the files. This allows you to use Spark to do the heavy lifting of transformation then persist the data in the lake. After this is done you can drop the table and downstream processes can access these optimized structures. You can also define managed tables, for which the underlying data files are stored in an internally managed storage location associated with the metastore. Managed tables are \"tightly-bound\" to the files, and dropping a managed table deletes the associated files.\r\n",
+					"\r\n",
+					"Managed tables can only be delta tables"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Create simple (external) table\r\n",
+					"\r\n",
+					"Check underlying file system"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"df = spark.read.csv(lakepath + 'csv/orders*.csv', header=True, inferSchema=True)\r\n",
+					"df = df.withColumn(\"OrderDateTS\", to_timestamp(col(\"OrderDate\"), \"MM/dd/yyyy HH:mm:ss\"))\r\n",
+					"df.write.saveAsTable(\"salesorders\", path=lakepath + \"/sales/orders\", format=\"parquet\", mode=\"overwrite\")\r\n",
+					"\r\n",
+					"dfr = spark.read.table(\"salesorders\")\r\n",
+					"display(dfr)\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Read from simple table using sql"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"\r\n",
+					"SELECT * FROM salesorders"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Create partitioned table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"tran = spark.sql(\"SELECT *, YEAR(OrderDateTS) AS Year, MONTH(OrderDateTS) AS MONTH FROM salesorders\")\r\n",
+					"tran.write.partitionBy(\"Year\", \"Month\") \\\r\n",
+					"    .saveAsTable(\"transorders\", path=lakepath+\"/tranorders\", format=\"parquet\", mode=\"overwrite\")"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Query the partitioned table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"SELECT * FROM transorders WHERE Year = 2021 AND Month=1"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Drop the tables\r\n",
+					"\r\n",
+					"Will not delete the files in the datalake"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"DROP TABLE transorders;\r\n",
+					"DROP TABLE salesorders;"
+				],
+				"execution_count": 16
+			}
+		]
+	}
+}

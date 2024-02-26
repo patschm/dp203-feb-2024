@@ -1,0 +1,1069 @@
+{
+	"name": "M3_2_3 Delta Lake",
+	"properties": {
+		"folder": {
+			"name": "Module 3.2"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "971bae92-a082-4f3c-883b-3511bb8675c3"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Delta Lake"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Globals"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"global lakepath\r\n",
+					"lakepath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/'\r\n",
+					"deltapath = 'deltabase/'"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Delta Files"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Create delta files (not a table)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"customers = spark.read.load(lakepath+\"csv/customers*.csv\", format=\"csv\", header=True)\r\n",
+					"orders = spark.read.load(lakepath+\"csv/orders*.csv\", format=\"csv\", header=True)\r\n",
+					"\r\n",
+					"# mode(\"append\") add to existing files\r\n",
+					"customers.write.format(\"delta\").mode(\"overwrite\").save(lakepath + deltapath + \"customers\")\r\n",
+					"orders.write.format(\"delta\").mode(\"overwrite\").save(lakepath + deltapath + \"orders\")\r\n",
+					""
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Read from delta files\r\n",
+					"Unmanaged Table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"df = spark.read.format(\"delta\").load(lakepath + deltapath + \"customers\")\r\n",
+					"display(df)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Modify delta files"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"deltaTable = DeltaTable.forPath(spark, lakepath + deltapath + \"products\")\r\n",
+					"\r\n",
+					"# Update the table\r\n",
+					"deltaTable.update(\r\n",
+					"    condition = \"Id == 0\",\r\n",
+					"    set = { \"Price\": \"1.0\" })"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Read versions"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"df = spark.read.format(\"delta\").load(lakepath + deltapath + \"products\").where(\"Id == 0\")\r\n",
+					"display(df)\r\n",
+					"\r\n",
+					"## timestampAsOf can be used too\r\n",
+					"df = spark.read.format(\"delta\").option(\"versionAsOf\", 0).load(lakepath + deltapath + \"products\").where(\"Id == 0\")\r\n",
+					"display(df)"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"SELECT * FROM delta.`abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/products` WHERE Id=0\r\n",
+					"-- Not supported for unmanaged\r\n",
+					"--SELECT * FROM delta.`abfss://files@patsynapselake.dfs.core.windows.net/sales100/deltabase/products` VERSION AS OF 0 WHERE Id = 0"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Relations"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"SELECT orders.Quantity, customers.LastName FROM delta.`abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/orders` AS orders\r\n",
+					"JOIN delta.`abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/customers` AS customers ON orders.CustomerId = customers.Id\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Delta Lake Tables\r\n",
+					"The benefits of using Delta Lake in a Synapse Analytics Spark pool include:\r\n",
+					"\r\n",
+					"- Relational tables that support querying and data modification. With Delta Lake, you can store data in tables that support CRUD (create, read, update, and delete) operations. In other words, you can select, insert, update, and delete rows of data in the same way you would in a relational database system.\r\n",
+					"- Support for ACID transactions. Relational databases are designed to support transactional data modifications that provide atomicity (transactions complete as a single unit of work), consistency (transactions leave the database in a consistent state), isolation (in-process transactions can't interfere with one another), and durability (when a transaction completes, the changes it made are persisted). Delta Lake brings this same transactional support to Spark by implementing a transaction log and enforcing serializable isolation for concurrent operations.\r\n",
+					"- Data versioning and time travel. Because all transactions are logged in the transaction log, you can track multiple versions of each table row and even use the time travel feature to retrieve a previous version of a row in a query.\r\n",
+					"- Support for batch and streaming data. While most relational databases include tables that store static data, Spark includes native support for streaming data through the Spark Structured Streaming API. Delta Lake tables can be used as both sinks (destinations) and sources for streaming data.\r\n",
+					"- Standard formats and interoperability. The underlying data for Delta Lake tables is stored in Parquet format, which is commonly used in data lake ingestion pipelines. Additionally, you can use the serverless SQL pool in Azure Synapse Analytics to query Delta Lake tables in SQL."
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Managed and unmanaged Tables\r\n",
+					"You recognize managed table by the missing file path. They are created for you"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"customersdf = spark.read.load(lakepath+\"csv/customers*.csv\", format=\"csv\", header=True)\r\n",
+					"ordersdf = spark.read.load(lakepath+\"csv/orders*.csv\", format=\"csv\", header=True)\r\n",
+					"\r\n",
+					"# Unmanaged Table. It specifies a file path\r\n",
+					"customersdf.write.format(\"delta\").option(\"path\", lakepath + deltapath + \"customers\").saveAsTable(\"customers\")\r\n",
+					"ordersdf.write.format(\"delta\").option(\"path\", lakepath + deltapath + \"orders\").saveAsTable(\"orders\")\r\n",
+					"\r\n",
+					"# Managed Table\r\n",
+					"customersdf.write.format(\"delta\").saveAsTable(\"man_customers\")\r\n",
+					"ordersdf.write.format(\"delta\").saveAsTable(\"man_orders\")\r\n",
+					""
+				],
+				"execution_count": 23
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"SELECT * FROM customers;\r\n",
+					"SELECT * FROM man_customers;"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### And query the tables"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"SELECT * FROM man_orders AS o\r\n",
+					"JOIN  man_customers AS c ON o.CustomerId = c.Id"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Create unmanaged Tables using sql"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"DROP TABLE IF EXISTS people;\r\n",
+					"CREATE TABLE people\r\n",
+					"(\r\n",
+					"    Id BIGINT,  -- Primary Key and IDENTITY is not supported. Requires Runtime version 10.4 or above.\r\n",
+					"    Name STRING NOT NULL,\r\n",
+					"    Age INT\r\n",
+					")\r\n",
+					"USING DELTA\r\n",
+					"LOCATION 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/people';\r\n",
+					"\r\n",
+					"DESCRIBE people;"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Create managed Tables using sql\r\n",
+					"Note the missing file path (LOCATION)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"DROP TABLE IF EXISTS man_people;\r\n",
+					"CREATE TABLE man_people\r\n",
+					"(\r\n",
+					"    Id BIGINT,  -- Primary Key and IDENTITY is not supported. Requires Runtime version 10.4 or above.\r\n",
+					"    Name STRING NOT NULL,\r\n",
+					"    Age INT\r\n",
+					")\r\n",
+					"USING DELTA;\r\n",
+					"\r\n",
+					"DESCRIBE man_people;"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Alternatively using pyspark"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"\r\n",
+					"DeltaTable.create(spark) \\\r\n",
+					"    .tableName(\"man_people\") \\\r\n",
+					"        .addColumn(\"Id\", \"BIGINT\", nullable=False) \\\r\n",
+					"        .addColumn(\"Name\", \"STRING\", nullable=False) \\\r\n",
+					"        .addColumn(\"Age\", \"INT\") \\\r\n",
+					"        .execute()\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### CRUD Operations"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"INSERT INTO man_people (Id, Name, Age) VALUES (1, \"Hank\", 45);\r\n",
+					"SELECT * FROM man_people;\r\n",
+					"\r\n",
+					"UPDATE man_people SET Name=\"Peter\";\r\n",
+					"SELECT * FROM man_people;\r\n",
+					"\r\n",
+					"DELETE FROM man_people WHERE Id = 1;\r\n",
+					"SELECT * FROM man_people;"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Alternatively using pyspark"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### Insert"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"deltaPeople = DeltaTable.forName(spark, \"man_people\")\r\n",
+					"schema = deltaPeople.toDF().schema\r\n",
+					"\r\n",
+					"# Method 1\r\n",
+					"data = [(1, \"Kees\", 56)]\r\n",
+					"df = spark.createDataFrame(data, schema)\r\n",
+					"df.write.format(\"delta\").mode(\"append\").saveAsTable(\"man_people\")\r\n",
+					"\r\n",
+					"display(deltaPeople)\r\n",
+					"\r\n",
+					"# Method 2\r\n",
+					"df1 = spark.createDataFrame([(2, \"Iris\", 24)], schema)\r\n",
+					"df1.write.insertInto(\"man_people\", overwrite=False)\r\n",
+					"\r\n",
+					"display(deltaPeople)\r\n",
+					"\r\n",
+					"# Method 3\r\n",
+					"spark.sql(\"INSERT INTO man_people (Id, Name, Age) VALUES (3, 'Rene', 45)\")\r\n",
+					"display(deltaPeople)\r\n",
+					"\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### Update"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"deltaPeople = DeltaTable.forName(spark, \"man_people\")\r\n",
+					"\r\n",
+					"deltaPeople.update(col(\"Id\") == 1, set={\"Name\":lit(\"Cornelis\")})\r\n",
+					"\r\n",
+					"display(deltaPeople.toDF())"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"#### Delete"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"deltaPeople = DeltaTable.forName(spark, \"man_people\")\r\n",
+					"\r\n",
+					"deltaPeople.delete(col(\"Id\") == 1)\r\n",
+					"\r\n",
+					"display(deltaPeople.toDF())"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### More commonly you'll use some kind of merge"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"deltaPeople = DeltaTable.forName(spark, \"man_people\")\r\n",
+					"schema = deltaPeople.toDF().schema\r\n",
+					"\r\n",
+					"data = [(2, \"Kees\", 56), (6, \"Herman\", 34), (7, \"Tinie\", 56), (3, \"Guus\", 67)]\r\n",
+					"df = spark.createDataFrame(data, schema)\r\n",
+					"\r\n",
+					"deltaPeople.alias(\"main\").merge(df.alias(\"upd\"), \"main.Id = upd.Id\") \\\r\n",
+					"    .whenMatchedUpdate(set={\"Name\":\"upd.Name\", \"Age\":\"upd.Age\"}) \\\r\n",
+					"    .whenNotMatchedInsert(values={\"Id\": \"upd.Id\", \"Name\": \"upd.Name\", \"Age\":\"upd.Age\"}) \\\r\n",
+					"    .execute()\r\n",
+					"\r\n",
+					"display(deltaPeople.toDF())"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### You can query delta tables on serveless pool\r\n",
+					"This query can be generated from the delta table folder"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					}
+				},
+				"source": [
+					"%%sql\r\n",
+					"SELECT\r\n",
+					"    TOP 100 *\r\n",
+					"FROM\r\n",
+					"    OPENROWSET(\r\n",
+					"        BULK 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/customers/',\r\n",
+					"        FORMAT = 'DELTA'\r\n",
+					"    ) AS [result]\r\n",
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Drop Delta Table"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"DROP TABLE IF EXISTS people;\r\n",
+					"DROP TABLE IF EXISTS customers;\r\n",
+					"DROP TABLE IF EXISTS products;\r\n",
+					"DROP TABLE IF EXISTS orders;\r\n",
+					"DROP TABLE IF EXISTS man_people;\r\n",
+					"DROP TABLE IF EXISTS man_customers;\r\n",
+					"DROP TABLE IF EXISTS man_products;\r\n",
+					"DROP TABLE IF EXISTS man_orders;"
+				],
+				"execution_count": 24
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from delta.tables import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"#deltaPeople = DeltaTable.createIfNotExists(spark).tableName(\"man_people\").execute()\r\n",
+					"deltaPeople = spark.read.table(\"man_people\")\r\n",
+					"print(deltaPeople)\r\n",
+					"schema = deltaPeople.schema\r\n",
+					"print(schema)"
+				],
+				"execution_count": 54
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## Streaming with Data Lake tables"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Create a source"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from notebookutils import mssparkutils\r\n",
+					"from pyspark.sql.types import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"in_path = lakepath + deltapath + \"/streaming\"\r\n",
+					"mssparkutils.fs.mkdirs(in_path)\r\n",
+					"\r\n",
+					"schema = StructType([\r\n",
+					"    StructField(\"event\", StringType(), False),\r\n",
+					"    StructField(\"detail\", StringType(), False)\r\n",
+					"])\r\n",
+					"\r\n",
+					"stream_df = spark.readStream.schema(schema) \\\r\n",
+					"    .option(\"maxFilesPerTrigger\", 1) \\\r\n",
+					"    .json(in_path)\r\n",
+					"\r\n",
+					"data = '''{\"event\": \"OK\", \"detail\": \"Data is OK\"}\r\n",
+					"{\"event\": \"OK\", \"detail\": \"Data is OK\"}\r\n",
+					"{\"event\": \"ERROR\", \"detail\": \"Data is not OK\"}\r\n",
+					"{\"event\": \"OK\", \"detail\": \"Data is OK\"}\r\n",
+					"{\"event\": \"OK\", \"detail\": \"Data is OK\"}\r\n",
+					"{\"event\": \"ERROR\", \"detail\": \"Data is not OK\"}\r\n",
+					"{\"event\": \"OK\", \"detail\": \"Data is OK\"}\r\n",
+					"{\"event\": \"OK\", \"detail\": \"Data is OK\"}\r\n",
+					"{\"event\": \"OK\", \"detail\": \"Data is OK\"}\r\n",
+					"{\"event\": \"ERROR\", \"detail\": \"Data is not OK\"}\r\n",
+					"{\"event\": \"OK\", \"detail\": \"Data is OK\"}'''\r\n",
+					"\r\n",
+					"mssparkutils.fs.put(in_path + \"/data.evt\", data, True)\r\n",
+					"print(\"Source Created\")"
+				],
+				"execution_count": 20
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Create a sink"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"table_path = lakepath + deltapath + \"events\"\r\n",
+					"checkpointpath =  lakepath + deltapath + \"checkpoint\"\r\n",
+					"deltastream = stream_df.writeStream.format(\"delta\") \\\r\n",
+					"    .option(\"checkpointLocation\", checkpointpath) \\\r\n",
+					"    .start(table_path)\r\n",
+					"print(\"Sink Created\")"
+				],
+				"execution_count": 18
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Read data"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"table_path = lakepath + deltapath + \"events\"\r\n",
+					"df = spark.read.format(\"delta\").load(table_path)\r\n",
+					"display(df)"
+				],
+				"execution_count": 21
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Stop the stream"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"deltastream.stop()"
+				],
+				"execution_count": 22
+			}
+		]
+	}
+}
