@@ -17,8 +17,8 @@
 					"Name": "Id",
 					"OriginDataTypeName": {
 						"TypeName": "long",
-						"IsNullable": false,
 						"IsComplexType": false,
+						"IsNullable": false,
 						"Properties": {
 							"HIVE_TYPE_STRING": "long"
 						}
@@ -30,8 +30,8 @@
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "string",
-						"IsNullable": false,
 						"IsComplexType": false,
+						"IsNullable": false,
 						"Length": 256,
 						"Properties": {
 							"HIVE_TYPE_STRING": "string"
@@ -44,8 +44,8 @@
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "string",
-						"IsNullable": false,
 						"IsComplexType": false,
+						"IsNullable": false,
 						"Length": 256,
 						"Properties": {
 							"HIVE_TYPE_STRING": "string"
@@ -58,8 +58,8 @@
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "decimal",
-						"IsNullable": false,
 						"IsComplexType": false,
+						"IsNullable": false,
 						"Precision": 10,
 						"Scale": 2,
 						"Properties": {
@@ -75,7 +75,7 @@
 				"FormatType": "csv",
 				"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
 				"Properties": {
-					"path": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/products*",
+					"path": "abfss://products*@pssynapselake.dfs.core.windows.net/",
 					"delimiter": ",",
 					"multiLine": "false",
 					"firstRowAsHeader": "false",
@@ -88,7 +88,7 @@
 			},
 			"Source": {
 				"Provider": "ADLS",
-				"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/products*",
+				"Location": "abfss://products*@pssynapselake.dfs.core.windows.net/",
 				"Properties": {
 					"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage",
 					"LocationSetToDatabaseDefault": false
@@ -106,8 +106,7 @@
 			"Description": "",
 			"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
 			"PrimaryKeys": "Id",
-			"spark.sql.sources.provider": "csv",
-			"sql:IsAppendOnly": false
+			"spark.sql.sources.provider": "csv"
 		},
 		"Retention": 0,
 		"Temporary": false,
