@@ -1,0 +1,23 @@
+{
+	"name": "relationship-gdgodsmoyn",
+	"properties": {
+		"Name": "relationship-gdgodsmoyn",
+		"EntityType": "RELATIONSHIP",
+		"Namespace": {
+			"DatabaseName": "M2SalesLake"
+		},
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"FromTableName": "Customers",
+		"ToTableName": "Orders",
+		"ColumnRelationshipInformations": [
+			{
+				"FromColumnName": "Id",
+				"ToColumnName": "CustomerId"
+			}
+		],
+		"RelationshipType": 0
+	},
+	"type": "RELATIONSHIP"
+}

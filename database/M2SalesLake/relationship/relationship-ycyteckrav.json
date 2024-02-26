@@ -1,0 +1,23 @@
+{
+	"name": "relationship-ycyteckrav",
+	"properties": {
+		"Name": "relationship-ycyteckrav",
+		"EntityType": "RELATIONSHIP",
+		"Namespace": {
+			"DatabaseName": "M2SalesLake"
+		},
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"FromTableName": "Products",
+		"ToTableName": "Orders",
+		"ColumnRelationshipInformations": [
+			{
+				"FromColumnName": "Id",
+				"ToColumnName": "ProductId"
+			}
+		],
+		"RelationshipType": 0
+	},
+	"type": "RELATIONSHIP"
+}
