@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "ps-synapse-managed"
+		},
+		"ps-synapse-managed-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:ps-synapse-managed.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"ps-synapse-managed-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://pssynapselake.dfs.core.windows.net"
+		}
+	}
+}
