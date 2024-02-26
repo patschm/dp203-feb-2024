@@ -2,7 +2,7 @@
 	"name": "M2_3_1 Lake Database Template",
 	"properties": {
 		"folder": {
-			"name": "Module 2_3"
+			"name": "Module 2.3"
 		},
 		"content": {
 			"query": "-- Generate From Template\n-- Manually\n-- 1) Create Database\n-- 2) Create ***Table from Data Lake***. Make sure input folder points to an existing folder where the data is in\n-- 3) Create Custom. Make sure input folder points to an existing FILE!!!! You cannot select a file >:-( \n-- 4) Map Data. Would be nice if it works.",
