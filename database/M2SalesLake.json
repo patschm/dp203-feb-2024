@@ -11,9 +11,9 @@
 		},
 		"Source": {
 			"Provider": "ADLS",
-			"Location": "abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv",
+			"Location": "abfss://files@pssynapselake.dfs.core.windows.net/lakedb",
 			"Properties": {
-				"FormatType": "csv",
+				"FormatType": "parquet",
 				"LinkedServiceName": "ps-synapse-managed-WorkspaceDefaultStorage"
 			}
 		}
