@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparky",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "24b7df33-4e27-4631-bce2-5137bc6da24d"
+				"spark.autotune.trackingId": "82ffc567-292f-4575-a867-8689662babf8"
 			}
 		},
 		"metadata": {
@@ -28,6 +32,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b9fc0ff8-96c9-40f6-b971-1c711883d3a0/resourceGroups/Demos/providers/Microsoft.Synapse/workspaces/ps-synapse-managed/bigDataPools/sparky",
+				"name": "sparky",
+				"type": "Spark",
+				"endpoint": "https://ps-synapse-managed.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparky",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -60,9 +79,9 @@
 				},
 				"source": [
 					"global lakepath\r\n",
-					"lakepath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/'"
+					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'"
 				],
-				"execution_count": 13
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -101,7 +120,7 @@
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"df = spark.read.load(lakepath + 'csv/customers.csv', format='csv', header=True)\r\n",
+					"df = spark.read.load(lakepath + 'csv/customers*.csv', format='csv', header=True)\r\n",
 					"display(df)"
 				],
 				"execution_count": null
@@ -138,7 +157,7 @@
 				},
 				"source": [
 					"%%spark\r\n",
-					"val df = spark.read.format(\"csv\").option(\"header\", \"true\").load(\"abfss://files@patsynapselake.dfs.core.windows.net/sales100/csv/customers.csv\")\r\n",
+					"val df = spark.read.format(\"csv\").option(\"header\", \"true\").load(\"abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/customers*.csv\")\r\n",
 					"display(df)"
 				],
 				"execution_count": null
@@ -171,7 +190,7 @@
 					"collapsed": false
 				},
 				"source": [
-					"df = spark.read.load(lakepath + 'json/customers/*.json', format='json')\r\n",
+					"df = spark.read.load(lakepath + 'json/customers*/*.json', format='json')\r\n",
 					"display(df)"
 				],
 				"execution_count": null
@@ -204,7 +223,7 @@
 					"collapsed": false
 				},
 				"source": [
-					"df = spark.read.load(lakepath + '/parquet/customers.parquet', format='parquet')\r\n",
+					"df = spark.read.load(lakepath + '/parquet/customers*.parquet', format='parquet')\r\n",
 					"display(df)"
 				],
 				"execution_count": null
@@ -256,7 +275,7 @@
 					"    StructField(\"Address\", addressSchema)\r\n",
 					"])\r\n",
 					"\r\n",
-					"df = spark.read.load(lakepath + \"parquet/customers.parquet\", format=\"parquet\", schema=tableSchema)\r\n",
+					"df = spark.read.load(lakepath + \"parquet/customers*.parquet\", format=\"parquet\", schema=tableSchema)\r\n",
 					"#df = spark.read.option(\"schema\", tableSchema).parquet(lakepath + \"parquet/customers.parquet\")\r\n",
 					"df.printSchema()\r\n",
 					"display(df)\r\n",
@@ -292,9 +311,9 @@
 					"collapsed": false
 				},
 				"source": [
-					"spark.conf.set('spark.sql.parquet.int96RebaseModeInRead', 'CORRECTED') # TimeStamp Issues\r\n",
-					"df = spark.read.load(lakepath + \"parquet/orders.parquet\", format=\"parquet\")\r\n",
-					"dfproducts = spark.read.load(lakepath + \"parquet/products.parquet\", format=\"parquet\")\r\n",
+					"#spark.conf.set('spark.sql.parquet.int96RebaseModeInRead', 'CORRECTED') # TimeStamp Issues\r\n",
+					"df = spark.read.load(lakepath + \"parquet/orders*.parquet\", format=\"parquet\")\r\n",
+					"dfproducts = spark.read.load(lakepath + \"parquet/products*.parquet\", format=\"parquet\")\r\n",
 					"df.printSchema()\r\n",
 					"#display(df.limit(10))\r\n",
 					"\r\n",
@@ -346,8 +365,8 @@
 					"collapsed": false
 				},
 				"source": [
-					"df = spark.read.load(lakepath + \"parquet/orders.parquet\", format=\"parquet\")\r\n",
-					"dfproducts = spark.read.load(lakepath + \"parquet/products.parquet\", format=\"parquet\")\r\n",
+					"df = spark.read.load(lakepath + \"parquet/orders*.parquet\", format=\"parquet\")\r\n",
+					"dfproducts = spark.read.load(lakepath + \"parquet/products*.parquet\", format=\"parquet\")\r\n",
 					"df = df.select(\"Quantity\", \"TotalPrice\", \"OrderDate\", \"ProductId\")\r\n",
 					"df = df.join(dfproducts, df.ProductId == dfproducts.Id)\r\n",
 					"\r\n",
@@ -395,7 +414,7 @@
 					"GROUP BY Product\r\n",
 					"ORDER BY Total DESC"
 				],
-				"execution_count": 74
+				"execution_count": null
 			}
 		]
 	}
