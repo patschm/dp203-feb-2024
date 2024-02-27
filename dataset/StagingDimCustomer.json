@@ -56,6 +56,10 @@
 		"typeProperties": {
 			"schema": "Staging",
 			"table": "DimCustomers"
+		},
+		"sqlPool": {
+			"referenceName": "sqlpool",
+			"type": "SqlPoolReference"
 		}
 	}
 }
