@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "2fac981a-f1ed-4d60-a6dc-be8e9eaec9c2"
+				"spark.autotune.trackingId": "0e154e04-ec54-470c-987a-0454a69b131d"
 			}
 		},
 		"metadata": {
@@ -110,7 +110,7 @@
 				"source": [
 					"lakedb = \"M2SalesLake\""
 				],
-				"execution_count": 2
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
