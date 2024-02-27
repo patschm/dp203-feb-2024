@@ -28,6 +28,10 @@
 			],
 			"sinks": [
 				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimProducts"
 				}
 			],
@@ -83,9 +87,9 @@
 				"     negate:true,",
 				"     broadcast: 'auto')~> NotExists",
 				"NotExists select(mapColumn(",
-				"          Id = ProductsCsv@Id,",
+				"          Id = {ProductsCsv@Id},",
 				"          BrandName,",
-				"          Name = ProductsCsv@Name,",
+				"          Name = {ProductsCsv@Name},",
 				"          Price,",
 				"          AlternateKey,",
 				"          BrandId",
@@ -94,11 +98,19 @@
 				"     skipDuplicateMapOutputs: true) ~> Project",
 				"Project sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: 'Staging') ~> DimProducts"
+				"     schemaName: '',",
+				"     tableName: '',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     allowCopyCommand: true,",
+				"     staged: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DimProducts"
 			]
 		}
 	}
