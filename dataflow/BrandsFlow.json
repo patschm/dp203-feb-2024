@@ -13,7 +13,7 @@
 			],
 			"sinks": [
 				{
-					"name": "DimBrandsUpd"
+					"name": "DimBrandsSink"
 				}
 			],
 			"transformations": [
@@ -67,7 +67,7 @@
 				"     ),",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: 'Main') ~> DimBrandsUpd"
+				"     schemaName: 'Main') ~> DimBrandsSink"
 			]
 		}
 	}
