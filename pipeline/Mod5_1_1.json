@@ -68,7 +68,8 @@
 						"coreCount": 8,
 						"computeType": "General"
 					},
-					"traceLevel": "Fine"
+					"traceLevel": "Fine",
+					"sourceStagingConcurrency": 1
 				}
 			},
 			{
@@ -126,11 +127,19 @@
 						"referenceName": "ProductsFlow",
 						"type": "DataFlowReference"
 					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+							"type": "LinkedServiceReference"
+						},
+						"folderPath": "files/testdata/staging"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
 					},
-					"traceLevel": "Fine"
+					"traceLevel": "Fine",
+					"sourceStagingConcurrency": 1
 				}
 			},
 			{
