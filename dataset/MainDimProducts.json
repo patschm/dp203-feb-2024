@@ -33,6 +33,10 @@
 		"typeProperties": {
 			"schema": "Main",
 			"table": "DimProducts"
+		},
+		"sqlPool": {
+			"referenceName": "sqlpool",
+			"type": "SqlPoolReference"
 		}
 	}
 }
