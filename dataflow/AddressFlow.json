@@ -1,0 +1,82 @@
+{
+	"name": "AddressFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "CustomersCsv",
+					"description": "Read Customers Data"
+				},
+				{
+					"name": "DimGeo"
+				}
+			],
+			"sinks": [
+				{
+					"name": "DimGeo1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "City"
+				},
+				{
+					"name": "Distinct"
+				},
+				{
+					"name": "CityNotExists"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Id as long,",
+				"          FirstName as string,",
+				"          LastName as string,",
+				"          CompanyName as string,",
+				"          StreetName as string,",
+				"          Number as integer,",
+				"          City as string,",
+				"          Region as string,",
+				"          Country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     wildcardPaths:['testdata/csv/customers*.csv'],",
+				"     fileSystem: 'files',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> CustomersCsv",
+				"source(output(",
+				"          Id as long,",
+				"          City as string,",
+				"          Region as string,",
+				"          Country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false) ~> DimGeo",
+				"CustomersCsv select(mapColumn(",
+				"          City,",
+				"          Region,",
+				"          Country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> City",
+				"City aggregate(groupBy(City),",
+				"     each(match(name!='City'), $$ = first($$))) ~> Distinct",
+				"Distinct, DimGeo exists(Distinct@City == DimGeo@City,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> CityNotExists",
+				"CityNotExists sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main') ~> DimGeo1"
+			]
+		}
+	}
+}
