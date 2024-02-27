@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "82ffc567-292f-4575-a867-8689662babf8"
+				"spark.autotune.trackingId": "25581f22-cd2a-49a6-ac47-346961fad4e1"
 			}
 		},
 		"metadata": {
@@ -61,7 +61,49 @@
 					}
 				},
 				"source": [
-					"Globals"
+					"### Parameters\r\n",
+					"In menu (...) Toggle Parameter cell"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"tags": [
+						"parameters"
+					]
+				},
+				"source": [
+					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### My First Dataframe\r\n",
+					"Dataframes are the heart of spark notebooks.\r\n",
+					"They have two types of operations: \r\n",
+					"- Transformations. Like select(), where(), withColumn() \r\n",
+					"- Actions. Like count(), collect(), show()\r\n",
+					"\r\n",
+					"Actions will fetch the data.\r\n",
+					"Transformations will not"
 				]
 			},
 			{
@@ -78,10 +120,21 @@
 					}
 				},
 				"source": [
-					"global lakepath\r\n",
-					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'"
+					"_data = [\r\n",
+					"    [0,\"Menno\",\"Wal\",\"Ven Online\",'{\"StreetName\":\"Emmakade\",\"Number\":92,\"City\":\"Breda\",\"Region\":\"Noord Brabant\",\"Country\":\"Nederland\"}'],\r\n",
+					"    [1,\"Xavier\",\"Jong\",\"Vries N.V.\",'{\"StreetName\":\"Basrijk\",\"Number\":85,\"City\":\"Utrecht\",\"Region\":\"Utrecht\",\"Country\":\"Nederland\"}']\r\n",
+					"]\r\n",
+					"# Columns for the data\r\n",
+					"_cols = ['Id', 'FirstName', 'LastName', 'CompanyName', 'Address']\r\n",
+					"# Lets create the raw Data Frame\r\n",
+					"df_raw = spark.createDataFrame(data = _data, schema = _cols)\r\n",
+					"\r\n",
+					"schema = \"StreetName STRING, Number INT, City STRING, Region STRING, Country STRING\"\r\n",
+					"df = df_raw.withColumn(\"Address\", from_json(col(\"Address\"), schema))\r\n",
+					"df.printSchema()\r\n",
+					"df.show()"
 				],
-				"execution_count": 2
+				"execution_count": null
 			},
 			{
 				"cell_type": "markdown",

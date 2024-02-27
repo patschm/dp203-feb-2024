@@ -2,7 +2,7 @@
 	"name": "M3_2_3 Delta Lake",
 	"properties": {
 		"folder": {
-			"name": "Module 3.2"
+			"name": "Module 3.3"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "971bae92-a082-4f3c-883b-3511bb8675c3"
+				"spark.autotune.trackingId": "c19088c8-b620-4a62-bdf9-6a39a1c72767"
 			}
 		},
 		"metadata": {
