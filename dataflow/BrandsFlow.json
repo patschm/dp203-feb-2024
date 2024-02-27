@@ -1,0 +1,74 @@
+{
+	"name": "BrandsFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "ProductsCsv"
+				},
+				{
+					"name": "DimBrands"
+				}
+			],
+			"sinks": [
+				{
+					"name": "DimBrandsUpd"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectBrands"
+				},
+				{
+					"name": "Distinct"
+				},
+				{
+					"name": "NotExists"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Id as long,",
+				"          BrandName as string,",
+				"          Name as string,",
+				"          Price as decimal(10,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     wildcardPaths:['testdata/csv/products*'],",
+				"     fileSystem: 'files',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> ProductsCsv",
+				"source(output(",
+				"          Id as long,",
+				"          Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false) ~> DimBrands",
+				"ProductsCsv select(mapColumn(",
+				"          BrandName",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectBrands",
+				"SelectBrands aggregate(groupBy(BrandName),",
+				"     each(match(name!='BrandName'), $$ = first($$))) ~> Distinct",
+				"Distinct, DimBrands exists(BrandName == Name,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> NotExists",
+				"NotExists sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          Name = BrandName",
+				"     ),",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main') ~> DimBrandsUpd"
+			]
+		}
+	}
+}
