@@ -46,11 +46,16 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"dataflow": {
+						"referenceName": "CustomersFlow",
+						"type": "DataFlowReference"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
 					},
-					"traceLevel": "Fine"
+					"traceLevel": "Fine",
+					"sourceStagingConcurrency": 1
 				}
 			},
 			{
@@ -105,8 +110,7 @@
 						"coreCount": 8,
 						"computeType": "General"
 					},
-					"traceLevel": "Fine",
-					"sourceStagingConcurrency": 1
+					"traceLevel": "Fine"
 				}
 			},
 			{
@@ -283,7 +287,18 @@
 						"type": "SqlPoolSource",
 						"queryTimeout": "02:00:00"
 					},
-					"enableStaging": false,
+					"sink": {
+						"type": "SqlPoolSink",
+						"allowCopyCommand": true
+					},
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+							"type": "LinkedServiceReference"
+						},
+						"path": "files/testdata/staging"
+					},
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -333,6 +348,12 @@
 				"inputs": [
 					{
 						"referenceName": "StagingDimProducts",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "MainDimProducts",
 						"type": "DatasetReference"
 					}
 				]
