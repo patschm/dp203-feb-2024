@@ -56,6 +56,10 @@
 		"typeProperties": {
 			"schema": "Main",
 			"table": "DimCustomers"
+		},
+		"sqlPool": {
+			"referenceName": "sqlpool",
+			"type": "SqlPoolReference"
 		}
 	}
 }
