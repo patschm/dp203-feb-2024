@@ -5,15 +5,27 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"linkedService": {
+						"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
 					"name": "CustomersCsv",
 					"description": "Read Customers Data"
 				},
 				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimGeo"
 				}
 			],
 			"sinks": [
 				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimGeoSink"
 				}
 			],
@@ -40,14 +52,17 @@
 				"          Region as string,",
 				"          Country as string",
 				"     ),",
+				"     useSchema: false,",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     wildcardPaths:['testdata/csv/customers*.csv'],",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
 				"     fileSystem: 'files',",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
-				"     columnNamesAsHeader: true) ~> CustomersCsv",
+				"     columnNamesAsHeader: true,",
+				"     wildcardPaths:['testdata/csv/customers*.csv']) ~> CustomersCsv",
 				"source(output(",
 				"          Id as long,",
 				"          City as string,",
@@ -55,12 +70,19 @@
 				"          Country as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
-				"     validateSchema: false) ~> DimGeo",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimGeo',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     staged: true) ~> DimGeo",
 				"CustomersCsv select(mapColumn(",
 				"          City,",
 				"          Region,",
 				"          Country",
 				"     ),",
+				"     partitionBy('roundRobin', 2),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> City",
 				"City aggregate(groupBy(City),",
@@ -70,12 +92,20 @@
 				"     broadcast: 'auto')~> CityNotExists",
 				"CityNotExists sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimGeo',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     allowCopyCommand: true,",
+				"     staged: true,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     saveOrder: 1,",
-				"     format: 'table',",
-				"     store: 'synapseanalytics',",
-				"     schemaName: 'Main') ~> DimGeoSink"
+				"     errorHandlingOption: 'stopOnFirstError') ~> DimGeoSink"
 			]
 		}
 	}
