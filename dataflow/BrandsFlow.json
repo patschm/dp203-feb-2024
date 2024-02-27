@@ -5,14 +5,26 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"linkedService": {
+						"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
 					"name": "ProductsCsv"
 				},
 				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimBrands"
 				}
 			],
 			"sinks": [
 				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimBrandsSink"
 				}
 			],
@@ -34,20 +46,29 @@
 				"          Name as string,",
 				"          Price as decimal(10,2)",
 				"     ),",
+				"     useSchema: false,",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     wildcardPaths:['testdata/csv/products*'],",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
 				"     fileSystem: 'files',",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
-				"     columnNamesAsHeader: true) ~> ProductsCsv",
+				"     columnNamesAsHeader: true,",
+				"     wildcardPaths:['testdata/csv/products*']) ~> ProductsCsv",
 				"source(output(",
 				"          Id as long,",
 				"          Name as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
-				"     validateSchema: false) ~> DimBrands",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimBrands',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     staged: true) ~> DimBrands",
 				"ProductsCsv select(mapColumn(",
 				"          BrandName",
 				"     ),",
@@ -60,14 +81,19 @@
 				"     broadcast: 'auto')~> NotExists",
 				"NotExists sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     mapColumn(",
-				"          Name = BrandName",
-				"     ),",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: 'Main') ~> DimBrandsSink"
+				"     schemaName: 'Main',",
+				"     tableName: 'DimBrands',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     allowCopyCommand: true,",
+				"     staged: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DimBrandsSink"
 			]
 		}
 	}
