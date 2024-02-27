@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "518f4e26-04a5-42c5-9375-d31b8494f5ae"
+				"spark.autotune.trackingId": "2fac981a-f1ed-4d60-a6dc-be8e9eaec9c2"
 			}
 		},
 		"metadata": {
@@ -78,6 +78,20 @@
 				]
 			},
 			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### Parameters \r\n",
+					"Cell menu: Toggle parameters"
+				]
+			},
+			{
 				"cell_type": "code",
 				"metadata": {
 					"jupyter": {
@@ -88,7 +102,10 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"tags": [
+						"parameters"
+					]
 				},
 				"source": [
 					"lakedb = \"M2SalesLake\""
@@ -102,6 +119,26 @@
 					"df.show(10)"
 				],
 				"execution_count": 3
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"### My First Dataframe\r\n",
+					"Dataframes are the heart of spark notebooks.\r\n",
+					"They have two types of operations: \r\n",
+					"- Transformations. Like select(), where(), withColumn() \r\n",
+					"- Actions. Like count(), collect(), show()\r\n",
+					"\r\n",
+					"Actions will fetch the data.\r\n",
+					"Transformations will not"
+				]
 			},
 			{
 				"cell_type": "code",
@@ -135,7 +172,8 @@
 					}
 				},
 				"source": [
-					"This seems to work however..."
+					"### New Data\r\n",
+					"spark.createDataFrame()"
 				]
 			},
 			{
@@ -164,7 +202,7 @@
 					"schema = \"StreetName STRING, Number INT, City STRING, Region STRING, Country STRING\"\r\n",
 					"df = df_raw.withColumn(\"Address\", from_json(col(\"Address\"), schema))\r\n",
 					"df.printSchema()\r\n",
-					"df.show(truncate=True)"
+					"df.show()"
 				],
 				"execution_count": 127
 			},
