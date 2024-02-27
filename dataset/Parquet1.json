@@ -1,0 +1,53 @@
+{
+	"name": "Parquet1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "testdata/partition_data",
+				"fileSystem": "files"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Id",
+				"type": "INT32"
+			},
+			{
+				"name": "Quantity",
+				"type": "INT32"
+			},
+			{
+				"name": "TotalPrice",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "ProductId",
+				"type": "INT32"
+			},
+			{
+				"name": "CustomerId",
+				"type": "INT32"
+			},
+			{
+				"name": "OrderDateTS",
+				"type": "INT96"
+			},
+			{
+				"name": "Year",
+				"type": "UTF8"
+			},
+			{
+				"name": "Month",
+				"type": "UTF8"
+			}
+		]
+	}
+}
