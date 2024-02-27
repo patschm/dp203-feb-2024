@@ -5,8 +5,6 @@
 			{
 				"name": "Address Flow",
 				"type": "ExecuteDataFlow",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -21,9 +19,6 @@
 						"referenceName": "AddressFlow",
 						"type": "DataFlowReference"
 					},
-					"staging": {
-						"folderPath": "files"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
@@ -34,8 +29,6 @@
 			{
 				"name": "Customers Flow",
 				"type": "ExecuteDataFlow",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Address Flow",
@@ -53,9 +46,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"staging": {
-						"folderPath": "files"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
@@ -66,8 +56,6 @@
 			{
 				"name": "Brands Flow",
 				"type": "ExecuteDataFlow",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -82,9 +70,6 @@
 						"referenceName": "BrandsFlow",
 						"type": "DataFlowReference"
 					},
-					"staging": {
-						"folderPath": "files"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
@@ -95,8 +80,6 @@
 			{
 				"name": "Products Flow",
 				"type": "ExecuteDataFlow",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Brands Flow",
@@ -118,21 +101,17 @@
 						"referenceName": "ProductsFlow",
 						"type": "DataFlowReference"
 					},
-					"staging": {
-						"folderPath": "files"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
 					},
-					"traceLevel": "Fine"
+					"traceLevel": "Fine",
+					"sourceStagingConcurrency": 1
 				}
 			},
 			{
 				"name": "Copy to live DimCustomer",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Customers Flow",
@@ -277,8 +256,6 @@
 			{
 				"name": "Copy to live DimProducts",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Customers Flow",
@@ -305,11 +282,6 @@
 					"source": {
 						"type": "SqlPoolSource",
 						"queryTimeout": "02:00:00"
-					},
-					"sink": {
-						"type": "SqlPoolSink",
-						"writeBehavior": "Insert",
-						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false,
 					"translator": {
