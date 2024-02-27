@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "25581f22-cd2a-49a6-ac47-346961fad4e1"
+				"spark.autotune.trackingId": "99475589-6d91-49d8-aa4c-0dc60c5a2243"
 			}
 		},
 		"metadata": {
@@ -103,7 +103,10 @@
 					"- Actions. Like count(), collect(), show()\r\n",
 					"\r\n",
 					"Actions will fetch the data.\r\n",
-					"Transformations will not"
+					"\r\n",
+					"Transformations will not.\r\n",
+					"\r\n",
+					"More operations [Here](https://api-docs.databricks.com/python/pyspark/latest/pyspark.sql/dataframe.html)"
 				]
 			},
 			{
