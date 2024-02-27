@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "c19088c8-b620-4a62-bdf9-6a39a1c72767"
+				"spark.autotune.trackingId": "f7bb99e0-fc10-42d6-bd8d-d146a96dabff"
 			}
 		},
 		"metadata": {
@@ -55,14 +55,18 @@
 					}
 				},
 				"source": [
-					"### Globals"
+					"### Parameters"
 				]
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
 				"source": [
-					"global lakepath\r\n",
-					"lakepath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/'\r\n",
+					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'\r\n",
 					"deltapath = 'deltabase/'"
 				],
 				"execution_count": 1
@@ -246,7 +250,7 @@
 				},
 				"source": [
 					"%%sql\r\n",
-					"SELECT * FROM delta.`abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/products` WHERE Id=0\r\n",
+					"SELECT * FROM delta.`abfss://files@pssynapselake.dfs.core.windows.net/testdata/deltabase/products` WHERE Id=0\r\n",
 					"-- Not supported for unmanaged\r\n",
 					"--SELECT * FROM delta.`abfss://files@patsynapselake.dfs.core.windows.net/sales100/deltabase/products` VERSION AS OF 0 WHERE Id = 0"
 				],
@@ -284,8 +288,8 @@
 				},
 				"source": [
 					"%%sql\r\n",
-					"SELECT orders.Quantity, customers.LastName FROM delta.`abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/orders` AS orders\r\n",
-					"JOIN delta.`abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/customers` AS customers ON orders.CustomerId = customers.Id\r\n",
+					"SELECT orders.Quantity, customers.LastName FROM delta.`abfss://files@pssynapselake.dfs.core.windows.net/testdata/deltabase/orders` AS orders\r\n",
+					"JOIN delta.`abfss://files@pssynapselake.dfs.core.windows.net/testdata/deltabase/customers` AS customers ON orders.CustomerId = customers.Id\r\n",
 					""
 				],
 				"execution_count": null
@@ -453,7 +457,7 @@
 					"    Age INT\r\n",
 					")\r\n",
 					"USING DELTA\r\n",
-					"LOCATION 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/people';\r\n",
+					"LOCATION 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/deltabase/people';\r\n",
 					"\r\n",
 					"DESCRIBE people;"
 				],
@@ -815,7 +819,7 @@
 					"    TOP 100 *\r\n",
 					"FROM\r\n",
 					"    OPENROWSET(\r\n",
-					"        BULK 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/deltabase/customers/',\r\n",
+					"        BULK 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/deltabase/customers/',\r\n",
 					"        FORMAT = 'DELTA'\r\n",
 					"    ) AS [result]\r\n",
 					""
@@ -934,7 +938,7 @@
 					"from pyspark.sql.types import *\r\n",
 					"from pyspark.sql.functions import *\r\n",
 					"\r\n",
-					"in_path = lakepath + deltapath + \"/streaming\"\r\n",
+					"in_path = f\"{lakepath}/{deltapath}/streaming\"\r\n",
 					"mssparkutils.fs.mkdirs(in_path)\r\n",
 					"\r\n",
 					"schema = StructType([\r\n",
