@@ -13,17 +13,17 @@
 				},
 				{
 					"linkedService": {
-						"referenceName": "ps-synapse-managed-WorkspaceDefaultSqlServer",
+						"referenceName": "SqlPool",
 						"type": "LinkedServiceReference"
 					},
-					"name": "DimBrandsOrigin"
+					"name": "DimBrandsMain"
 				},
 				{
 					"linkedService": {
-						"referenceName": "ps-synapse-managed-WorkspaceDefaultSqlServer",
+						"referenceName": "SqlPool",
 						"type": "LinkedServiceReference"
 					},
-					"name": "DimProductsOrigin"
+					"name": "DimProductsMain"
 				}
 			],
 			"sinks": [
@@ -32,7 +32,7 @@
 						"referenceName": "SqlPool",
 						"type": "LinkedServiceReference"
 					},
-					"name": "DimProducts"
+					"name": "DimProductsStaging"
 				}
 			],
 			"transformations": [
@@ -65,25 +65,25 @@
 				"     validateSchema: false,",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: '',",
-				"     tableName: '',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimBrands',",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     staged: true) ~> DimBrandsOrigin",
+				"     staged: true) ~> DimBrandsMain",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: '',",
-				"     tableName: '',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimProducts',",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     staged: true) ~> DimProductsOrigin",
-				"ProductsCsv, DimBrandsOrigin lookup(BrandName == DimBrandsOrigin@Name,",
+				"     staged: true) ~> DimProductsMain",
+				"ProductsCsv, DimBrandsMain lookup(BrandName == DimBrandsOrigin@Name,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> JoinBrands",
 				"JoinBrands derive(AlternateKey = ProductsCsv@Id,",
 				"          BrandId = DimBrandsOrigin@Id) ~> AddColumns",
-				"AddColumns, DimProductsOrigin exists(AddColumns@AlternateKey == DimProductsOrigin@AlternateKey,",
+				"AddColumns, DimProductsMain exists(AddColumns@AlternateKey == DimProductsOrigin@AlternateKey,",
 				"     negate:true,",
 				"     broadcast: 'auto')~> NotExists",
 				"NotExists select(mapColumn(",
@@ -100,8 +100,8 @@
 				"     validateSchema: false,",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: '',",
-				"     tableName: '',",
+				"     schemaName: 'Staging',",
+				"     tableName: 'DimProducts',",
 				"     insertable: true,",
 				"     updateable: false,",
 				"     deletable: false,",
@@ -110,7 +110,7 @@
 				"     staged: true,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> DimProducts"
+				"     errorHandlingOption: 'stopOnFirstError') ~> DimProductsStaging"
 			]
 		}
 	}
