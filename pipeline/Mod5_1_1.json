@@ -391,6 +391,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"notebook": {
+						"referenceName": "M5_2_1 Orders Flow",
+						"type": "NotebookReference"
+					},
 					"snapshot": true,
 					"sparkPool": {
 						"referenceName": "sparky",
