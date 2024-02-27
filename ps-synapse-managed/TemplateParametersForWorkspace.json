@@ -5,6 +5,9 @@
 		"workspaceName": {
 			"value": "ps-synapse-managed"
 		},
+		"SqlPool_connectionString": {
+			"value": ""
+		},
 		"ps-synapse-managed-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:ps-synapse-managed.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
