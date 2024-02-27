@@ -14,7 +14,7 @@
 			],
 			"sinks": [
 				{
-					"name": "DimGeo1"
+					"name": "DimGeoSink"
 				}
 			],
 			"transformations": [
@@ -75,7 +75,7 @@
 				"     saveOrder: 1,",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: 'Main') ~> DimGeo1"
+				"     schemaName: 'Main') ~> DimGeoSink"
 			]
 		}
 	}
