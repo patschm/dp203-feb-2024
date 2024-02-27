@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "99475589-6d91-49d8-aa4c-0dc60c5a2243"
+				"spark.autotune.trackingId": "bb1744a3-eccf-47a1-bab9-a9ee64b469d2"
 			}
 		},
 		"metadata": {
@@ -84,7 +84,7 @@
 				"source": [
 					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'"
 				],
-				"execution_count": 2
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -120,9 +120,15 @@
 						"transient": {
 							"deleting": false
 						}
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"#dataarray = from_json(\"\", \"{'www':'vvv'}\")\r\n",
+					"#print(dataarray)\r\n",
+					"\r\n",
 					"_data = [\r\n",
 					"    [0,\"Menno\",\"Wal\",\"Ven Online\",'{\"StreetName\":\"Emmakade\",\"Number\":92,\"City\":\"Breda\",\"Region\":\"Noord Brabant\",\"Country\":\"Nederland\"}'],\r\n",
 					"    [1,\"Xavier\",\"Jong\",\"Vries N.V.\",'{\"StreetName\":\"Basrijk\",\"Number\":85,\"City\":\"Utrecht\",\"Region\":\"Utrecht\",\"Country\":\"Nederland\"}']\r\n",
@@ -131,11 +137,14 @@
 					"_cols = ['Id', 'FirstName', 'LastName', 'CompanyName', 'Address']\r\n",
 					"# Lets create the raw Data Frame\r\n",
 					"df_raw = spark.createDataFrame(data = _data, schema = _cols)\r\n",
+					"#df_raw.printSchema()\r\n",
+					"#display(df_raw)\r\n",
 					"\r\n",
 					"schema = \"StreetName STRING, Number INT, City STRING, Region STRING, Country STRING\"\r\n",
 					"df = df_raw.withColumn(\"Address\", from_json(col(\"Address\"), schema))\r\n",
 					"df.printSchema()\r\n",
-					"df.show()"
+					"display(df)\r\n",
+					"#df.show()"
 				],
 				"execution_count": null
 			},
@@ -177,6 +186,7 @@
 				"source": [
 					"%%pyspark\r\n",
 					"df = spark.read.load(lakepath + 'csv/customers*.csv', format='csv', header=True)\r\n",
+					"df.printSchema()\r\n",
 					"display(df)"
 				],
 				"execution_count": null
@@ -378,7 +388,7 @@
 					"#display(df.limit(10))\r\n",
 					"\r\n",
 					"#joining\r\n",
-					"df = df.join(dfproducts, df.ProductId == dfproducts.Id)\r\n",
+					"df = df.join(dfproducts, df.ProductId == dfproducts.Id, \"inner\")\r\n",
 					"#display(df)\r\n",
 					"\r\n",
 					"#grouping\r\n",
@@ -432,7 +442,7 @@
 					"\r\n",
 					"display(order_df.limit(10))"
 				],
-				"execution_count": null
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
