@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparky",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f7bb99e0-fc10-42d6-bd8d-d146a96dabff"
+				"spark.autotune.trackingId": "63401a53-45de-45d0-8c56-d165e8128468"
 			}
 		},
 		"metadata": {
@@ -28,6 +32,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b9fc0ff8-96c9-40f6-b971-1c711883d3a0/resourceGroups/Demos/providers/Microsoft.Synapse/workspaces/ps-synapse-managed/bigDataPools/sparky",
+				"name": "sparky",
+				"type": "Spark",
+				"endpoint": "https://ps-synapse-managed.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparky",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -69,7 +88,7 @@
 					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'\r\n",
 					"deltapath = 'deltabase/'"
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -113,13 +132,15 @@
 				"source": [
 					"customers = spark.read.load(lakepath+\"csv/customers*.csv\", format=\"csv\", header=True)\r\n",
 					"orders = spark.read.load(lakepath+\"csv/orders*.csv\", format=\"csv\", header=True)\r\n",
+					"products = spark.read.load(lakepath+\"csv/prod*.csv\", format=\"csv\", header=True)\r\n",
 					"\r\n",
 					"# mode(\"append\") add to existing files\r\n",
 					"customers.write.format(\"delta\").mode(\"overwrite\").save(lakepath + deltapath + \"customers\")\r\n",
 					"orders.write.format(\"delta\").mode(\"overwrite\").save(lakepath + deltapath + \"orders\")\r\n",
+					"products.write.format(\"delta\").mode(\"overwrite\").save(lakepath + deltapath + \"products\")\r\n",
 					""
 				],
-				"execution_count": 4
+				"execution_count": 6
 			},
 			{
 				"cell_type": "markdown",
@@ -150,10 +171,10 @@
 					"collapsed": false
 				},
 				"source": [
-					"df = spark.read.format(\"delta\").load(lakepath + deltapath + \"customers\")\r\n",
+					"df = spark.read.format(\"delta\").load(lakepath + deltapath + \"products\").where(\"Id==101\")\r\n",
 					"display(df)"
 				],
-				"execution_count": null
+				"execution_count": 21
 			},
 			{
 				"cell_type": "markdown",
@@ -189,10 +210,10 @@
 					"\r\n",
 					"# Update the table\r\n",
 					"deltaTable.update(\r\n",
-					"    condition = \"Id == 0\",\r\n",
+					"    condition = \"Id == 101\",\r\n",
 					"    set = { \"Price\": \"1.0\" })"
 				],
-				"execution_count": 8
+				"execution_count": 12
 			},
 			{
 				"cell_type": "markdown",
@@ -222,11 +243,11 @@
 					"collapsed": false
 				},
 				"source": [
-					"df = spark.read.format(\"delta\").load(lakepath + deltapath + \"products\").where(\"Id == 0\")\r\n",
+					"df = spark.read.format(\"delta\").load(lakepath + deltapath + \"products\").where(\"Id == 101\")\r\n",
 					"display(df)\r\n",
 					"\r\n",
 					"## timestampAsOf can be used too\r\n",
-					"df = spark.read.format(\"delta\").option(\"versionAsOf\", 0).load(lakepath + deltapath + \"products\").where(\"Id == 0\")\r\n",
+					"df = spark.read.format(\"delta\").option(\"versionAsOf\", 0).load(lakepath + deltapath + \"products\").where(\"Id == 101\")\r\n",
 					"display(df)"
 				],
 				"execution_count": null
@@ -378,7 +399,7 @@
 					"SELECT * FROM customers;\r\n",
 					"SELECT * FROM man_customers;"
 				],
-				"execution_count": null
+				"execution_count": 24
 			},
 			{
 				"cell_type": "markdown",
@@ -415,7 +436,7 @@
 					"SELECT * FROM man_orders AS o\r\n",
 					"JOIN  man_customers AS c ON o.CustomerId = c.Id"
 				],
-				"execution_count": null
+				"execution_count": 25
 			},
 			{
 				"cell_type": "markdown",
@@ -546,7 +567,7 @@
 					"        .execute()\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 26
 			},
 			{
 				"cell_type": "markdown",
@@ -657,7 +678,7 @@
 					"\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 28
 			},
 			{
 				"cell_type": "markdown",
@@ -696,7 +717,7 @@
 					"\r\n",
 					"display(deltaPeople.toDF())"
 				],
-				"execution_count": null
+				"execution_count": 29
 			},
 			{
 				"cell_type": "markdown",
@@ -867,7 +888,7 @@
 					"DROP TABLE IF EXISTS man_products;\r\n",
 					"DROP TABLE IF EXISTS man_orders;"
 				],
-				"execution_count": 24
+				"execution_count": 31
 			},
 			{
 				"cell_type": "code",
@@ -965,7 +986,7 @@
 					"mssparkutils.fs.put(in_path + \"/data.evt\", data, True)\r\n",
 					"print(\"Source Created\")"
 				],
-				"execution_count": 20
+				"execution_count": 35
 			},
 			{
 				"cell_type": "markdown",
@@ -1001,7 +1022,7 @@
 					"    .start(table_path)\r\n",
 					"print(\"Sink Created\")"
 				],
-				"execution_count": 18
+				"execution_count": 33
 			},
 			{
 				"cell_type": "markdown",
@@ -1035,7 +1056,7 @@
 					"df = spark.read.format(\"delta\").load(table_path)\r\n",
 					"display(df)"
 				],
-				"execution_count": 21
+				"execution_count": 36
 			},
 			{
 				"cell_type": "markdown",
@@ -1066,7 +1087,7 @@
 				"source": [
 					"deltastream.stop()"
 				],
-				"execution_count": 22
+				"execution_count": 37
 			}
 		]
 	}
