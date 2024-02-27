@@ -5,17 +5,33 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"linkedService": {
+						"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
 					"name": "CustomersCsv"
 				},
 				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimGeo"
 				},
 				{
-					"name": "DimCustomersOrig"
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
+					"name": "DimCustomersMain"
 				}
 			],
 			"sinks": [
 				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimCustomers"
 				}
 			],
@@ -45,38 +61,34 @@
 				"          Region as string,",
 				"          Country as string",
 				"     ),",
+				"     useSchema: false,",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     wildcardPaths:['testdata/csv/customers*'],",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
 				"     fileSystem: 'files',",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
-				"     columnNamesAsHeader: true) ~> CustomersCsv",
-				"source(output(",
-				"          Id as long,",
-				"          City as string,",
-				"          Region as string,",
-				"          Country as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false) ~> DimGeo",
-				"source(output(",
-				"          Id as long,",
-				"          AlternateKey as long,",
-				"          FirstName as string,",
-				"          LastName as string,",
-				"          CompanyName as string,",
-				"          StreetName as string,",
-				"          Number as integer,",
-				"          GeoId as long,",
-				"          City as string,",
-				"          Region as string,",
-				"          Country as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false) ~> DimCustomersOrig",
-				"CustomersCsv, DimGeo lookup(CustomersCsv@City == DimGeo@City,",
+				"     columnNamesAsHeader: true,",
+				"     wildcardPaths:['testdata/csv/customers*']) ~> CustomersCsv",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimGeo',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     staged: true) ~> DimGeo",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimCustomers',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     staged: true) ~> DimCustomersMain",
+				"CustomersCsv, DimGeo lookup(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> LookupGeoId",
@@ -97,16 +109,24 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> Select",
-				"Select, DimCustomersOrig exists(Select@AlternateKey == DimCustomersOrig@AlternateKey,",
+				"Select, DimCustomersMain exists(Select@AlternateKey == DimCustomersMain@AlternateKey,",
 				"     negate:true,",
 				"     broadcast: 'auto')~> NotExists",
 				"NotExists sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
 				"     format: 'table',",
 				"     store: 'synapseanalytics',",
-				"     schemaName: 'Staging') ~> DimCustomers"
+				"     schemaName: 'Staging',",
+				"     tableName: 'DimCustomers',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     allowCopyCommand: true,",
+				"     staged: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DimCustomers"
 			]
 		}
 	}
