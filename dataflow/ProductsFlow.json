@@ -5,12 +5,24 @@
 		"typeProperties": {
 			"sources": [
 				{
+					"linkedService": {
+						"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
 					"name": "ProductsCsv"
 				},
 				{
+					"linkedService": {
+						"referenceName": "ps-synapse-managed-WorkspaceDefaultSqlServer",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimBrandsOrigin"
 				},
 				{
+					"linkedService": {
+						"referenceName": "ps-synapse-managed-WorkspaceDefaultSqlServer",
+						"type": "LinkedServiceReference"
+					},
 					"name": "DimProductsOrigin"
 				}
 			],
@@ -34,36 +46,33 @@
 				}
 			],
 			"scriptLines": [
-				"source(output(",
-				"          Id as long,",
-				"          BrandName as string,",
-				"          Name as string,",
-				"          Price as decimal(10,2)",
-				"     ),",
+				"source(useSchema: false,",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     wildcardPaths:['testdata/csv/products*'],",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
 				"     fileSystem: 'files',",
 				"     columnDelimiter: ',',",
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
-				"     columnNamesAsHeader: true) ~> ProductsCsv",
-				"source(output(",
-				"          Id as long,",
-				"          Name as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false) ~> DimBrandsOrigin",
-				"source(output(",
-				"          Id as long,",
-				"          AlternateKey as long,",
-				"          BrandId as long,",
-				"          BrandName as string,",
-				"          Name as string,",
-				"          Price as decimal(10,2)",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false) ~> DimProductsOrigin",
+				"     columnNamesAsHeader: true,",
+				"     wildcardPaths:['testdata/csv/products*']) ~> ProductsCsv",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: '',",
+				"     tableName: '',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     staged: true) ~> DimBrandsOrigin",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: '',",
+				"     tableName: '',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     staged: true) ~> DimProductsOrigin",
 				"ProductsCsv, DimBrandsOrigin lookup(BrandName == DimBrandsOrigin@Name,",
 				"     multiple: false,",
 				"     pickup: 'any',",
