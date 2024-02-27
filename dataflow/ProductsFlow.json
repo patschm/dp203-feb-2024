@@ -1,0 +1,104 @@
+{
+	"name": "ProductsFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "ProductsCsv"
+				},
+				{
+					"name": "DimBrandsOrigin"
+				},
+				{
+					"name": "DimProductsOrigin"
+				}
+			],
+			"sinks": [
+				{
+					"name": "DimProducts"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinBrands"
+				},
+				{
+					"name": "AddColumns"
+				},
+				{
+					"name": "NotExists"
+				},
+				{
+					"name": "Project"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Id as long,",
+				"          BrandName as string,",
+				"          Name as string,",
+				"          Price as decimal(10,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     wildcardPaths:['testdata/csv/products*'],",
+				"     fileSystem: 'files',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> ProductsCsv",
+				"source(output(",
+				"          Id as long,",
+				"          Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false) ~> DimBrandsOrigin",
+				"source(output(",
+				"          Id as long,",
+				"          AlternateKey as long,",
+				"          BrandId as long,",
+				"          BrandName as string,",
+				"          Name as string,",
+				"          Price as decimal(10,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false) ~> DimProductsOrigin",
+				"ProductsCsv, DimBrandsOrigin lookup(BrandName == DimBrandsOrigin@Name,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> JoinBrands",
+				"JoinBrands derive(AlternateKey = ProductsCsv@Id,",
+				"          BrandId = DimBrandsOrigin@Id) ~> AddColumns",
+				"AddColumns, DimProductsOrigin exists(AddColumns@AlternateKey == DimProductsOrigin@AlternateKey,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> NotExists",
+				"NotExists select(mapColumn(",
+				"          Id = ProductsCsv@Id,",
+				"          BrandName,",
+				"          Name = ProductsCsv@Name,",
+				"          Price,",
+				"          AlternateKey,",
+				"          BrandId",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> Project",
+				"Project sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          Id,",
+				"          AlternateKey,",
+				"          BrandId,",
+				"          BrandName,",
+				"          Name,",
+				"          Price",
+				"     ),",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Staging') ~> DimProducts"
+			]
+		}
+	}
+}
