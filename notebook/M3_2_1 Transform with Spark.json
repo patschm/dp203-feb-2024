@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "aa14fdcd-d502-467b-a601-32f0380706b9"
+				"spark.autotune.trackingId": "d0093982-a36d-41b1-a0d1-e9be9fd489c3"
 			}
 		},
 		"metadata": {
@@ -42,14 +42,18 @@
 					}
 				},
 				"source": [
-					"### Globals"
+					"### Params"
 				]
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
 				"source": [
-					"global lakepath\r\n",
-					"lakepath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/'"
+					"lakepath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/'"
 				],
 				"execution_count": 1
 			},
@@ -63,7 +67,7 @@
 					}
 				},
 				"source": [
-					"## Transform and Save"
+					"### Transform and Save"
 				]
 			},
 			{
@@ -139,7 +143,8 @@
 					"# DateTime is en-US format (C#) so convert it first\r\n",
 					"dated = df.withColumn(\"OrderDateTS\", to_timestamp(col(\"OrderDate\"), \"MM/dd/yyyy HH:mm:ss\"))\r\n",
 					"dated = dated.drop(\"OrderDate\")\r\n",
-					"dated = dated.withColumn(\"Year\", year(col(\"OrderDateTS\"))).withColumn(\"Month\", month(col(\"OrderDateTS\")))\r\n",
+					"dated = dated.withColumn(\"Year\", year(col(\"OrderDateTS\"))) \\\r\n",
+					"    .withColumn(\"Month\", month(col(\"OrderDateTS\")))\r\n",
 					"\r\n",
 					"display(dated)\r\n",
 					"\r\n",

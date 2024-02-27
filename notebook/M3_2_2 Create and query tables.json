@@ -16,7 +16,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "91d3bfb5-0acf-4d64-a089-44ff6176c468"
+				"spark.autotune.trackingId": "7092448b-f1dc-46ae-b29a-5fd5afa89ae2"
 			}
 		},
 		"metadata": {
@@ -42,14 +42,18 @@
 					}
 				},
 				"source": [
-					"### Globals"
+					"### Parameters"
 				]
 			},
 			{
 				"cell_type": "code",
+				"metadata": {
+					"tags": [
+						"parameters"
+					]
+				},
 				"source": [
-					"global lakepath\r\n",
-					"lakepath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/'"
+					"lakepath = 'abfss://files@psssynapselake.dfs.core.windows.net/testdata/"
 				],
 				"execution_count": 1
 			},
