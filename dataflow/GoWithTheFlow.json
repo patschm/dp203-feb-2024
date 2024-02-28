@@ -10,10 +10,42 @@
 						"type": "LinkedServiceReference"
 					},
 					"name": "Branding"
+				},
+				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
+					"name": "MainDimBrands"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "SqlPool",
+						"type": "LinkedServiceReference"
+					},
+					"name": "DimBands",
+					"rejectedDataLinkedService": {
+						"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					}
+				}
+			],
+			"transformations": [
+				{
+					"name": "BrandInfo"
+				},
+				{
+					"name": "Distinct"
+				},
+				{
+					"name": "IfNotExists"
+				},
+				{
+					"name": "OnlyName"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          Id as long,",
@@ -31,7 +63,50 @@
 				"     escapeChar: '\\\\',",
 				"     quoteChar: '\\\"',",
 				"     columnNamesAsHeader: true,",
-				"     wildcardPaths:['testdata/csv/prod*']) ~> Branding"
+				"     wildcardPaths:['testdata/csv/prod*']) ~> Branding",
+				"source(output(",
+				"          Id as long,",
+				"          Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimBrands',",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     staged: true) ~> MainDimBrands",
+				"Branding select(mapColumn(",
+				"          Name = BrandName",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> BrandInfo",
+				"BrandInfo aggregate(groupBy(Name),",
+				"     each(match(name!='Name'), $$ = first($$))) ~> Distinct",
+				"Distinct, MainDimBrands lookup(Distinct@Name == MainDimBrands@Name,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> IfNotExists",
+				"IfNotExists select(mapColumn(",
+				"          Name = Distinct@Name",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> OnlyName",
+				"OnlyName sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'synapseanalytics',",
+				"     schemaName: 'Main',",
+				"     tableName: 'DimBrands',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     allowCopyCommand: true,",
+				"     staged: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> DimBands"
 			]
 		}
 	}
