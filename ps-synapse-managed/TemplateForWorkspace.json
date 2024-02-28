@@ -513,6 +513,60 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/MySecond')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "TestFlow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "GoWithTheFlow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Branding": {},
+									"MainDimBrands": {},
+									"DimBands": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "files/testdata/staging"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/GoWithTheFlow')]",
+				"[concat(variables('workspaceId'), '/linkedServices/ps-synapse-managed-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/MainDimCustomer')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -825,6 +879,27 @@
 							"computeType": "General",
 							"coreCount": 8,
 							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/IntegrationRuntime1')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
 						}
 					}
 				}
@@ -1202,6 +1277,125 @@
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
 						"     errorHandlingOption: 'stopOnFirstError') ~> DimCustomers"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ps-synapse-managed-WorkspaceDefaultStorage')]",
+				"[concat(variables('workspaceId'), '/linkedServices/SqlPool')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/GoWithTheFlow')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"linkedService": {
+								"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+								"type": "LinkedServiceReference"
+							},
+							"name": "Branding"
+						},
+						{
+							"linkedService": {
+								"referenceName": "SqlPool",
+								"type": "LinkedServiceReference"
+							},
+							"name": "MainDimBrands"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "SqlPool",
+								"type": "LinkedServiceReference"
+							},
+							"name": "DimBands",
+							"rejectedDataLinkedService": {
+								"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"transformations": [
+						{
+							"name": "BrandInfo"
+						},
+						{
+							"name": "Distinct"
+						},
+						{
+							"name": "IfNotExists"
+						},
+						{
+							"name": "OnlyName"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Id as long,",
+						"          BrandName as string,",
+						"          Name as string,",
+						"          Price as decimal(10,2)",
+						"     ),",
+						"     useSchema: false,",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'delimited',",
+						"     fileSystem: 'files',",
+						"     columnDelimiter: ',',",
+						"     escapeChar: '\\\\',",
+						"     quoteChar: '\\\"',",
+						"     columnNamesAsHeader: true,",
+						"     wildcardPaths:['testdata/csv/prod*']) ~> Branding",
+						"source(output(",
+						"          Id as long,",
+						"          Name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'table',",
+						"     store: 'synapseanalytics',",
+						"     schemaName: 'Main',",
+						"     tableName: 'DimBrands',",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     staged: true) ~> MainDimBrands",
+						"Branding select(mapColumn(",
+						"          Name = BrandName",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> BrandInfo",
+						"BrandInfo aggregate(groupBy(Name),",
+						"     each(match(name!='Name'), $$ = first($$))) ~> Distinct",
+						"Distinct, MainDimBrands lookup(Distinct@Name == MainDimBrands@Name,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> IfNotExists",
+						"IfNotExists select(mapColumn(",
+						"          Name = Distinct@Name",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> OnlyName",
+						"OnlyName sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'table',",
+						"     store: 'synapseanalytics',",
+						"     schemaName: 'Main',",
+						"     tableName: 'DimBrands',",
+						"     insertable: true,",
+						"     updateable: false,",
+						"     deletable: false,",
+						"     upsertable: false,",
+						"     allowCopyCommand: true,",
+						"     staged: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> DimBands"
 					]
 				}
 			},
@@ -4451,6 +4645,10 @@
 				},
 				"nbformat": 4,
 				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparky",
+					"type": "BigDataPoolReference"
+				},
 				"sessionProperties": {
 					"driverMemory": "28g",
 					"driverCores": 4,
@@ -4461,7 +4659,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "7ccba562-24d1-4af1-9434-577c3440e03c"
+						"spark.autotune.trackingId": "4bcd8dc3-a6cc-4070-ba36-b60f8f7085c5"
 					}
 				},
 				"metadata": {
@@ -4473,6 +4671,20 @@
 					},
 					"language_info": {
 						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/b9fc0ff8-96c9-40f6-b971-1c711883d3a0/resourceGroups/Demos/providers/Microsoft.Synapse/workspaces/ps-synapse-managed/bigDataPools/sparky",
+						"name": "sparky",
+						"type": "Spark",
+						"endpoint": "https://ps-synapse-managed.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparky",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.3",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -4488,7 +4700,7 @@
 							"from pyspark.sql.functions import *\r\n",
 							"from pyspark.sql.types import *\r\n",
 							"\r\n",
-							"orderspath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/csv/orders_*.csv'\r\n",
+							"orderspath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/orders_*.csv'\r\n",
 							"stagingOrders = 'sqlpool.Staging.FactOrders2'\r\n",
 							"\r\n",
 							"dimCustomers = spark.read.synapsesql(\"sqlpool.Main.DimCustomers\").withColumnRenamed(\"Id\", \"CustId\")\r\n",
@@ -5052,18 +5264,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpool')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "westeurope"
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/sparky')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -5083,6 +5283,18 @@
 				"sparkVersion": "3.3",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "westeurope"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpool')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
