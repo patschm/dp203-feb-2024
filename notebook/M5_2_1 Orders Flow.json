@@ -6,6 +6,10 @@
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "sparky",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -16,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "7ccba562-24d1-4af1-9434-577c3440e03c"
+				"spark.autotune.trackingId": "4bcd8dc3-a6cc-4070-ba36-b60f8f7085c5"
 			}
 		},
 		"metadata": {
@@ -28,6 +32,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/b9fc0ff8-96c9-40f6-b971-1c711883d3a0/resourceGroups/Demos/providers/Microsoft.Synapse/workspaces/ps-synapse-managed/bigDataPools/sparky",
+				"name": "sparky",
+				"type": "Spark",
+				"endpoint": "https://ps-synapse-managed.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparky",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -43,7 +62,7 @@
 					"from pyspark.sql.functions import *\r\n",
 					"from pyspark.sql.types import *\r\n",
 					"\r\n",
-					"orderspath = 'abfss://files@4dnsynapselake.dfs.core.windows.net/sales_small/csv/orders_*.csv'\r\n",
+					"orderspath = 'abfss://files@pssynapselake.dfs.core.windows.net/testdata/csv/orders_*.csv'\r\n",
 					"stagingOrders = 'sqlpool.Staging.FactOrders2'\r\n",
 					"\r\n",
 					"dimCustomers = spark.read.synapsesql(\"sqlpool.Main.DimCustomers\").withColumnRenamed(\"Id\", \"CustId\")\r\n",
