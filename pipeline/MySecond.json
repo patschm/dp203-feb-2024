@@ -19,6 +19,13 @@
 						"referenceName": "GoWithTheFlow",
 						"type": "DataFlowReference"
 					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "ps-synapse-managed-WorkspaceDefaultStorage",
+							"type": "LinkedServiceReference"
+						},
+						"folderPath": "files/testdata/staging"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
