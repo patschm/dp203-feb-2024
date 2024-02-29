@@ -5,7 +5,7 @@
 			"name": "Module 6.2"
 		},
 		"content": {
-			"query": "CREATE CREDENTIAL [4dn-cosmos-sales]\nWITH IDENTITY = 'SHARED ACCESS SIGNATURE', SECRET = 'Lt0uq8Db4AHLSwxzRURygeDglXAyd75H2R05JMLdiTfCrb0NxE407MK27KbKFoV03nIY3xhcoO3CACDbUREiQg=='\nGO\n\nSELECT TOP 100 *\nFROM OPENROWSET(​PROVIDER = 'CosmosDB',\n                CONNECTION = 'Account=4dn-cosmos-sales;Database=SalesDB',\n                OBJECT = 'sales',\n                SERVER_CREDENTIAL = '4dn-cosmos-sales'\n) AS [sales]\n",
+			"query": "CREATE CREDENTIAL [4dn-cosmos-sales]\nWITH IDENTITY = 'SHARED ACCESS SIGNATURE', SECRET = '3hNjEtSpjDLfZE0KJe6KdtVK5YvNfQW9aqgvqPeLudCpIv4tWPTz7rt52EV3h6WynRcWCbIek1krACDbGQkKfg=='\nGO\n\nSELECT TOP 100 *\nFROM OPENROWSET(​PROVIDER = 'CosmosDB',\n                CONNECTION = 'Account=4dncosmos;Database=SalesDB',\n                OBJECT = 'sales',\n                SERVER_CREDENTIAL = '4dn-cosmos-sales'\n) AS [sales]\n",
 			"metadata": {
 				"language": "sql"
 			},
