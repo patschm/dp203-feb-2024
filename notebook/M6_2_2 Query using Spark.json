@@ -1,6 +1,9 @@
 {
 	"name": "M6_2_2 Query using Spark",
 	"properties": {
+		"folder": {
+			"name": "Module 6.2"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -17,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "977ae976-f33d-48a4-b830-b446e883df01"
+				"spark.autotune.trackingId": "da86bd99-84f0-4893-85db-73e6e19d9a87"
 			}
 		},
 		"metadata": {
